@@ -1,0 +1,32 @@
+----------  nop
+---------1  halt
+--------1-  A <= input()
+--------11  output(A)
+------1ccc  A <= -c
+-----1-rrr  A <= r
+-----11rrr  r <= A
+----1ccccc  A <= c
+-1--cccccc  goto PC + c
+-1-1cccccc  goto PC - c
+-11-cccccc  if A goto PC + c
+-111cccccc  if A goto PC - c
+1ooorrrsss  A <= r o s
+
+where ooo in
+  ---  +
+  --1  -
+  -1-  *
+  -11  /
+  1--  =
+  1-1  <
+  11-  ||
+  111  not
+
+NOTES:
+  not is logical, so
+    not(x) is 1 if x = 0
+    not(x) is 0 otherwise
+
+  not is unary, so
+    "1111rrrsss" means A <= not(r)
+
