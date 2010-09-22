@@ -164,3 +164,6 @@ def log(s, im):
 
 main()
 
+#import cProfile
+#cProfile.run('main()')
+
