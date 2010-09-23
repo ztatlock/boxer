@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, Image
+import sys, time, Image
 
 NC = 10 # columns
 NR = 8  # rows
@@ -8,7 +8,11 @@ NR = 8  # rows
 LRAT = 0.15 # trim left ratio
 RRAT = 0.03 # trim right ratio
 
+BKGRND  = 25  # max avg pxl of background row/col
+PUNCHED = 240 # min avg pxl of punched cell
+
 def main():
+  log('init')
   im = input()
   im = bw(im)
   im = crop(im)
@@ -21,29 +25,21 @@ def main():
   s = '\n'.join(s)
   print s
 
+  log('done')
+  write_log()
+
 def input():
   im = Image.open(sys.argv[1])
-  log('input', im)
+  log('input read')
+  ilog('input', im)
   return im
 
 def bw(im):
   if im.mode == 'RGB':
-    src = im.load()
-    w, h = im.size
-    bw = Image.new('1', (w, h))
-    snk = bw.load()
-
-    for c in range(w):
-      for r in range(h):
-        if src[c, r][0] > 80 and \
-           src[c, r][1] > 80 and \
-           src[c, r][2] > 80:
-          snk[c, r] = 1
-        else:
-          snk[c, r] = 0
-  else:
-    bw = im.convert('1')
-  log('bw', bw)
+    im = im.point(lambda x: 0 if x < 130 else 255)
+  bw = im.convert('L')
+  log('converted to bw')
+  ilog('bw', bw)
   return bw
 
 def crop(im):
@@ -56,14 +52,14 @@ def crop(im):
   lft = 0
   for c in cols:
     a = avg([pxl[c, r] for r in rows])
-    if a > 0.2:
+    if a > BKGRND:
       lft = c
       break
 
   top = 0
   for r in rows:
     a = avg([pxl[c, r] for c in cols])
-    if a > 0.2:
+    if a > BKGRND:
       top = r
       break
 
@@ -71,7 +67,7 @@ def crop(im):
   cols.reverse()
   for c in cols:
     a = avg([pxl[c, r] for r in rows])
-    if a > 0.2:
+    if a > BKGRND:
       rht = c
       break
 
@@ -79,12 +75,13 @@ def crop(im):
   rows.reverse()
   for r in rows:
     a = avg([pxl[c, r] for c in cols])
-    if a > 0.2:
+    if a > BKGRND:
       bot = r
       break
 
   im = im.crop((lft, top, rht, bot))
-  log('crop', im)
+  log('cropped')
+  ilog('crop', im)
   return im
 
 def trim(im):
@@ -92,7 +89,8 @@ def trim(im):
   l = int(w * LRAT)
   r = int(w - (w * RRAT))
   im = im.crop((l, 0, r, h))
-  log('trim', im)
+  log('trimmed')
+  ilog('trim', im)
   return im
 
 def rows(im):
@@ -107,8 +105,9 @@ def rows(im):
     t = bound(i)
     b = bound(i + 1)
     r = im.crop((0, t, w, b))
-    log('row-%d' % i, r)
+    ilog('row-%d' % i, r)
     rows.append(r)
+  log('extracted rows')
   return rows
 
 def cells(rows):
@@ -116,6 +115,7 @@ def cells(rows):
   for i in range(len(rows)):
     cs = cols(rows[i], i)
     cells.append(cs)
+  log('extracted cells')
   return cells
 
 def cols(row, n):
@@ -130,7 +130,7 @@ def cols(row, n):
     l = bound(i)
     r = bound(i + 1)
     c = row.crop((l, 0, r, h))
-    log('cell-%d-%d' % (n, i), c)
+    ilog('cell-%d-%d' % (n, i), c)
     cols.append(c)
   return cols
 
@@ -142,24 +142,34 @@ def decode(card):
       c = entry(cell)
       line.append(c)
     prog.append(line)
+  log('decoded')
   return prog
 
 def entry(im):
   a = avg(im.getdata())
-  if a > 0.95:
-    return '-'
-  else:
+  if a < PUNCHED:
     return '1'
-
-def sum(l):
-  return reduce(lambda x, y: x + y, l)
+  else:
+    return '-'
 
 def avg(l):
-  t = sum(l) * 1.0
-  n = len(l)
-  return t / n
+  t = 0.0
+  for e in l:
+    t += e
+  return t / len(l)
 
-def log(s, im):
+lbuf = []
+lbuf.append(time.strftime('%y-%m-%d %H:%M:%S'))
+def log(msg):
+  t = '%0.2f ' % time.clock()
+  lbuf.append(t + msg)
+
+def write_log():
+  f = open('log/decode', 'w')
+  f.write('\n'.join(lbuf))
+  f.close()
+
+def ilog(s, im):
   im.save('log/%s.png' % s)
 
 main()
