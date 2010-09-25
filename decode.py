@@ -19,12 +19,8 @@ def main():
   im = trim(im)
   rs = rows(im)
   cs = cells(rs)
-
-  prog = decode(cs)
-  s = [''.join(r) for r in prog]
-  s = '\n'.join(s)
-  print s
-
+  prg = decode(cs)
+  print_prog(prg)
   log('done')
   write_log()
 
@@ -151,6 +147,11 @@ def entry(im):
     return '1'
   else:
     return '-'
+
+def print_prog(prg):
+  s = [''.join(r) for r in prg]
+  s = '\n'.join(s)
+  print s
 
 def avg(l):
   t = 0.0
