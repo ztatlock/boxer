@@ -1,2 +1,6 @@
 decode/log/*.png
 decode/log/decode
+
+interp/interp
+interp/interp.cmi
+interp/interp.cmo
