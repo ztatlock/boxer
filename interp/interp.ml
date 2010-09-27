@@ -337,7 +337,8 @@ let step_star deck : string =
     st.pc |> lkup_instr deck
           |> step st
   done;
-  bigs_str st.out
+  st.out |> bigs_str
+         |> mkstr "%s\n"
 
 let main () =
   () |> input_deck
