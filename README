@@ -1,1 +1,13 @@
 punch card programming
+
+Use 3x5 index cards, a sharpie, and a webcam to program a simple machine.
+
+The index card is oriented vertically with the red line to the left. This
+provides 10 columns relative to the blue lines and leaves the far left and
+and right parts of the card for comments. Each card has 8 rows spaced
+uniformly, corresponding to 8 instructions of 10 bits each.
+
+The machine is a simple accumulator machine. It only provides a few basic
+operations, 8 registers, and I/O. The registers and operations work with
+arbitrary precision integers.
+
