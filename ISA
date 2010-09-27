@@ -2,15 +2,18 @@
 ---------1  halt
 --------1-  A <= input()
 --------11  output(A)
+-------1__  ???
 ------1ccc  A <= -c
 -----1-rrr  A <= r
 -----11rrr  r <= A
 ----1ccccc  A <= c
+---1ooorrr  A <= A o r
+--1ccccccc  goto c
 -1--cccccc  goto PC + c
 -1-1cccccc  goto PC - c
 -11-cccccc  if A goto PC + c
 -111cccccc  if A goto PC - c
-1ooorrrsss  A <= r o s
+1ooolllrrr  A <= l o r
 
 where ooo in
   ---  +
@@ -22,11 +25,11 @@ where ooo in
   11-  ||
   111  not
 
-NOTES:
-  not is logical, so
-    not(x) is 1 if x = 0
-    not(x) is 0 otherwise
+=, <, ||, not are logical where 
+  0 => false
+  x => true for x =/= 0
 
-  not is unary, so
-    "1111rrrsss" means A <= not(r)
+not is unary
+  "---1111rrr" means A <= not(A)
+  "1111lllrrr" means A <= not(l)
 
