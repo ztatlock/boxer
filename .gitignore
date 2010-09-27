@@ -1,2 +1,2 @@
-log/*.png
-log/decode
+decode/log/*.png
+decode/log/decode
